@@ -3,297 +3,480 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>พระยาขอน x ทนอึด Hybrid V5</title>
+    <title>Logic Master & Profit Reset Combined</title>
     <style>
+        /* Shared & Root Styles */
         :root {
-            --bg-color: #000; --text-color: #fff; --box-bg: #0d0d0d; --border-color: #222;
-            --config-bg: #111; --dot-empty: #1a1a1a; --neon-blue: #00f2ff; --neon-red: #ff4444;
-            --neon-green: #2ecc71; --gold: #ffd700;
+            --bg-color: #000;
+            --text-color: #fff;
+            --box-bg: #0d0d0d;
+            --border-color: #222;
+            --config-bg: #111;
+            --dot-empty: #1a1a1a;
+            --gold-glow: 0 0 20px #ffd700;
+            --super-glow: 0 0 25px #00f2ff, inset 0 0 10px #00f2ff;
+            --win-color: #2ecc71;
+            --loss-color: #ff4444;
+            /* System 2 Roots */
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --blue: #3498db;
         }
         .light-theme {
-            --bg-color: #e0e4e8; --text-color: #1a1a1a; --box-bg: #ffffff; --border-color: #b0b8c1;
-            --config-bg: #f8f9fa; --dot-empty: #d1d9e6;
-        }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { 
-            font-family: 'Segoe UI', 'Kanit', sans-serif; 
-            background: var(--bg-color); color: var(--text-color); margin: 0; padding: 10px; 
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-        }
-        
-        .header-area { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .super-toggle { background: var(--config-bg); border: 2px solid var(--border-color); color: var(--text-color); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: 800; font-size: 12px; }
-        .super-toggle.on { background: var(--neon-blue); color: #000; border-color: #fff; box-shadow: 0 0 10px var(--neon-blue); }
-        
-        .prediction-center { margin-bottom: 20px; text-align: center; }
-        .target-circle { 
-            width: 110px; height: 110px; border: 4px solid var(--border-color); border-radius: 50%; 
-            margin: 0 auto; font-size: 32px; font-weight: 900; color: #444; background: var(--box-bg); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
-            transition: all 0.3s ease;
-        }
-        .bet-display { font-size: 14px; color: #fbbf24; margin-top: 2px; font-weight: 800; }
-        .active-P { background: #0044ff !important; color: #fff !important; box-shadow: 0 0 20px #0044ff; }
-        .active-B { background: #cc0000 !important; color: #fff !important; box-shadow: 0 0 20px #cc0000; }
-        
-        .money-status-bar { 
-            width: 100%; max-width: 400px; background: var(--config-bg); 
-            border: 1px solid var(--border-color); border-radius: 10px; 
-            padding: 8px 15px; margin-bottom: 10px; display: flex; 
-            justify-content: space-between; align-items: center; font-size: 13px;
+            --bg-color: #e0e4e8;
+            --text-color: #1a1a1a;
+            --box-bg: #ffffff;
+            --border-color: #b0b8c1;
+            --config-bg: #f8f9fa;
+            --dot-empty: #d1d9e6;
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body { 
+            font-family: 'Segoe UI', 'Tahoma', sans-serif; 
+            background: var(--bg-color); color: var(--text-color); margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Container Sections */
+        .section-wrapper {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px 10px;
+            border-bottom: 5px solid #333;
+        }
+
+        /* --- UI Section 1: พระยาขอน Logic Master --- */
+        @keyframes super-pulse {
+            0%, 100% { box-shadow: 0 0 15px #00f2ff; }
+            50% { box-shadow: 0 0 30px #00f2ff, 0 0 10px #fff; }
+        }
+        .super-active { animation: super-pulse 1.5s infinite; border-color: #00f2ff !important; }
+        .header-area { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin: 0 auto 15px; }
+        .super-toggle { background: var(--config-bg); border: 2px solid var(--border-color); color: var(--text-color); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: 800; font-size: 12px; }
+        .super-toggle.on { background: #00f2ff; color: #000; border-color: #fff; box-shadow: 0 0 10px #00f2ff; }
+        .theme-toggle { background: var(--config-bg); border: 2px solid var(--border-color); color: var(--text-color); padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
+        .prediction-center { margin-bottom: 20px; text-align: center; }
+        .target-circle { 
+            width: 100px; height: 100px; border: 4px solid var(--border-color); border-radius: 50%; 
+            margin: 0 auto; font-size: 40px; font-weight: 900; color: #444; background: var(--box-bg); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
+        }
+        .active-P { background: #0044ff !important; color: #fff !important; }
+        .active-B { background: #cc0000 !important; color: #fff !important; }
+        .dna-tag { position: absolute; bottom: -22px; font-size: 10px; color: #888; white-space: nowrap; }
+        .stats-container { width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin: 0 auto 10px; font-size: 14px; font-weight: bold; }
+        .stat-group { display: flex; gap: 8px; }
+        .plate-box { background: var(--box-bg); border-radius: 12px; padding: 8px; width: 100%; max-width: 400px; margin: 0 auto 15px; border: 2px solid var(--border-color); overflow: hidden; }
         .grid { display: grid; grid-template-rows: repeat(6, 1fr); grid-template-columns: repeat(12, 1fr); grid-auto-flow: column; gap: 4px; width: 100%; }
         .dot { width: 100%; aspect-ratio: 1; border-radius: 50%; background: var(--dot-empty); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; }
         .dot.P { background: #0044ff; } .dot.B { background: #cc0000; } .dot.T { background: #2ecc71; }
-        
-        .main-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 400px; margin-bottom: 15px; }
+        .main-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 400px; margin: 0 auto 15px; }
         .btn { padding: 20px 0; border: none; border-radius: 12px; font-size: 28px; font-weight: 900; color: #fff; cursor: pointer; box-shadow: 0 5px 0 rgba(0,0,0,0.4); }
         .btn-p { background: #0044ff; } .btn-t { background: #2ecc71; } .btn-b { background: #cc0000; }
-        .btn-sub { padding: 12px 0; border: 2px solid var(--border-color); border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; background: var(--config-bg); color: var(--text-color); width: 100%; }
+        .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.4); }
+        .util-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; max-width: 400px; margin: 0 auto; }
+        .btn-sub { padding: 12px 0; border: 2px solid var(--border-color); border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer; background: var(--config-bg); color: var(--text-color); }
+
+        /* --- UI Section 2: ระบบทนอึด --- */
+        .container2 { background: white; padding: 1.5rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); width: 100%; color: #333; text-align: center; }
+        .setup-bar { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .input-group { text-align: left; background: #f8f9fa; padding: 10px; border-radius: 10px; border: 1px solid #eee; }
+        .input-group label { font-size: 0.75rem; color: #7f8c8d; display: block; margin-bottom: 4px; font-weight: bold; }
+        .input-group input { width: 100%; border: none; background: transparent; font-size: 1rem; font-weight: bold; outline: none; }
+        .status-box { background: var(--primary); color: white; padding: 25px; border-radius: 15px; margin-bottom: 15px; transition: 0.3s; }
+        .bet-val { font-size: 3.5rem; font-weight: 800; margin: 5px 0; }
+        .step-info { display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.8; margin-bottom: 10px; }
+        .mode-tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-top: 5px; background: rgba(255,255,255,0.1); }
+        .clearing-active { background: var(--warning) !important; color: white; animation: flash 1s infinite; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-bottom: 15px; }
+        .stat-item { background: #f8f9fa; padding: 8px; border-radius: 10px; border: 1px solid #eee; }
+        .stat-label { font-size: 0.65rem; color: #7f8c8d; }
+        .stat-num { font-size: 1rem; font-weight: bold; }
+        .balance-card { background: #fff; border: 2px solid #eee; padding: 10px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .bal-val { font-size: 1.3rem; font-weight: bold; }
+        .btn-main2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn-w { background: var(--success); box-shadow: 0 4px 0 #219150; border:none; padding:16px; border-radius:12px; font-size:1.2rem; font-weight:bold; color:white; cursor:pointer;}
+        .btn-l { background: var(--danger); box-shadow: 0 4px 0 #c0392b; border:none; padding:16px; border-radius:12px; font-size:1.2rem; font-weight:bold; color:white; cursor:pointer;}
+        .btn-u { background: #95a5a6; width: 100%; margin-top: 12px; font-size: 1rem; border:none; padding:12px; border-radius:12px; color:white; cursor:pointer;}
+        .btn-h { background: #34495e; width: 100%; margin-top: 8px; font-size: 0.9rem; border:none; padding:10px; border-radius:12px; color:white; cursor:pointer;}
+
+        /* Modals & Overlays */
+        #historyOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 2000; display: none; flex-direction: column; padding: 20px; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid #1a1a1a; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: var(--box-bg); width: 85%; max-width: 320px; border-radius: 15px; padding: 20px; border: 2px solid var(--border-color); text-align: center; color: var(--text-color); }
+        .modal-white { background: white !important; color: #333 !important; }
+        .log-list { text-align: left; max-height: 300px; overflow-y: auto; font-size: 0.9rem; padding-top: 10px; }
+        .log-item { padding: 8px 0; border-bottom: 1px solid #eee; font-weight: bold; }
         
-        /* Modal & Goals UI */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 9999; }
-        .modal-content { background: #111; width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; border: 1px solid #333; text-align: center; }
-        
-        /* Special Goal Success UI */
-        .goal-content { background: linear-gradient(180deg, #1a1a1a 0%, #000 100%); border: 2px solid var(--gold); box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
-        .success-icon { width: 80px; height: 80px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 40px; color: #000; box-shadow: 0 0 20px var(--gold); }
-        
-        .history-list { max-height: 250px; overflow-y: auto; text-align: left; margin-top: 15px; }
-        .history-item { padding: 8px 12px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; font-size: 12px; }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .win-text { color: var(--win-color); }
+        .loss-text { color: var(--loss-color); }
     </style>
 </head>
 <body>
-    <div class="header-area">
-        <button class="super-toggle" id="superBtn" onclick="toggleSuperMode()">⚡ SUPER OFF</button>
-        <button class="btn-sub" style="width: auto; padding: 5px 15px; border-radius: 20px;" onclick="toggleTheme()">🌓 THEME</button>
-    </div>
 
-    <div class="prediction-center">
-        <div id="target" class="target-circle">
-            <span id="targetText">-</span>
-            <div id="ui-bet" class="bet-display"></div>
-            <div id="targetDna" style="position: absolute; bottom: -22px; font-size: 10px; color: #888;"></div>
+    <div class="section-wrapper">
+        <div class="header-area">
+            <button class="super-toggle" id="superBtn" onclick="toggleSuperMode()">⚡ SUPER OFF</button>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓 THEME</button>
+        </div>
+        <div class="prediction-center">
+            <div id="target" class="target-circle">
+                <span id="targetText">-</span>
+                <div id="targetDna" class="dna-tag"></div>
+            </div>
+        </div>
+        <div class="stats-container">
+            <div class="stat-group">
+                <span style="color:#0044ff">P: <span id="countP">0</span></span>
+                <span style="color:#2ecc71">T: <span id="countT">0</span></span>
+                <span style="color:#cc0000">B: <span id="countB">0</span></span>
+            </div>
+            <div onclick="openHistory()" style="cursor:pointer;">📜 ประวัติ: <span id="winCountSmall">0</span></div>
+        </div>
+        <div class="plate-box">
+            <div id="grid" class="grid"></div>
+        </div>
+        <div class="main-buttons">
+            <button class="btn btn-p" onclick="processAdd('P')">P</button>
+            <button class="btn btn-t" onclick="processAdd('T')">T</button>
+            <button class="btn btn-b" onclick="processAdd('B')">B</button>
+        </div>
+        <div class="util-grid">
+            <button class="btn-sub" onclick="undo1()">ย้อนกลับ</button>
+            <button class="btn-sub" style="color: #ffd700;" onclick="openModal('mainSettingModal')">ตั้งค่า</button>
+            <button class="btn-sub" style="color:#ff4444;" onclick="reset1()">ล้าง</button>
         </div>
     </div>
 
-    <div class="money-status-bar">
-        <div>กำไร: <span id="ui-bal">0</span></div>
-        <div id="ui-mode" style="font-size:10px; color:var(--neon-blue);">โหมดปกติ</div>
-        <div style="color:#888;">เป้า: <span id="curTargetDisp"></span></div>
-    </div>
-
-    <div style="width: 100%; max-width: 400px; display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;">
-        <div style="display:flex; gap:8px; font-weight: bold;">
-            <span style="color:#0044ff">P: <span id="countP">0</span></span>
-            <span style="color:var(--neon-green)">T: <span id="countT">0</span></span>
-            <span style="color:#cc0000">B: <span id="countB">0</span></span>
-        </div>
-        <div onclick="openModal('historyModal')" style="cursor:pointer; background: rgba(46,204,113,0.1); padding: 2px 10px; border-radius: 5px; color: var(--neon-green); font-weight: bold;">
-            🏆 WIN: <span id="winCountSmall">0</span> ▾
-        </div>
-    </div>
-
-    <div style="background:var(--box-bg); border-radius:12px; padding:8px; width:100%; max-width:400px; margin-bottom:15px; border:2px solid var(--border-color);">
-        <div id="grid" class="grid"></div>
-    </div>
-
-    <div class="main-buttons">
-        <button class="btn btn-p" onclick="processAdd('P')">P</button>
-        <button class="btn btn-t" onclick="processAdd('T')">T</button>
-        <button class="btn btn-b" onclick="processAdd('B')">B</button>
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; max-width: 400px;">
-        <button class="btn-sub" onclick="undo()">ย้อนกลับ</button>
-        <button class="btn-sub" style="color: var(--gold);" onclick="openModal('mainSettingModal')">ตั้งค่า</button>
-        <button class="btn-sub" style="color:var(--neon-red);" onclick="openModal('resetConfirmModal')">ล้างข้อมูล</button>
-    </div>
-
-    <div id="goalReachedModal" class="modal">
-        <div class="modal-content goal-content" onclick="event.stopPropagation()">
-            <div class="success-icon">💰</div>
-            <h2 style="color: var(--gold); margin: 0;">บรรลุเป้าหมาย!</h2>
-            <p style="color: #fff; font-size: 18px; margin: 10px 0;">กำไรสะสม: <span id="finalProfit" style="color:var(--neon-green); font-weight: bold;">0</span></p>
-            <p style="color: #888; font-size: 12px;">ยินดีด้วย! คุณทำกำไรได้ตามเป้าหมายที่ตั้งไว้แล้ว ควรพักผ่อนหรือเริ่มต้นรอบใหม่</p>
-            <button class="btn-sub" style="background: var(--gold); color: #000; border: none; margin-top: 15px;" onclick="closeModals()">ขอบคุณ (ไปต่อ)</button>
-            <button class="btn-sub" style="background: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); margin-top: 8px;" onclick="resetAll()">เริ่มรอบใหม่ทันที</button>
-        </div>
-    </div>
-
-    <div id="resetConfirmModal" class="modal" onclick="closeModals()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
-            <h3 style="color: #fff; margin: 0;">รีเซ็ตข้อมูลทั้งหมด?</h3>
-            <p style="color: #666; font-size: 12px; margin: 10px 0 20px;">สถิติและกำไรจะถูกล้างค่าทั้งหมด</p>
-            <button class="btn-sub" style="background: var(--neon-red); color: #fff; border: none;" onclick="resetAll()">ยืนยัน</button>
-            <button class="btn-sub" style="background: #222; color: #888; border: none; margin-top: 8px;" onclick="closeModals()">ยกเลิก</button>
+    <div class="section-wrapper">
+        <div class="container2">
+            <h3 style="margin: 0 0 15px 0;">ระบบทนอึด V.ProfitReset</h3>
+            <div class="setup-bar">
+                <div class="input-group">
+                    <label>ระบุเงินแต่ละ Step (เช่น 10, 20, 50)</label>
+                    <input type="text" id="money-sequence" value="10, 20, 40, 80, 160" onchange="updateSequence()">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="input-group">
+                        <label>เป้ากำไรสูงสุด (Alert)</label>
+                        <input type="number" id="profit-target" value="0">
+                    </div>
+                    <div class="input-group" style="background: #eef2f7;">
+                        <label>จำนวน Step</label>
+                        <div id="step-count" style="font-weight: bold; padding-top:2px; color:#333;">5</div>
+                    </div>
+                </div>
+            </div>
+            <div class="status-box" id="ui-box">
+                <div class="step-info">
+                    <span id="ui-step">STEP 1</span>
+                    <span id="ui-pos">ไม้ที่ 1</span>
+                </div>
+                <div style="font-size: 0.8rem; opacity: 0.7;">เดิมพันถัดไป</div>
+                <div class="bet-val" id="ui-bet">10</div>
+                <div id="ui-mode" class="mode-tag">โหมดปกติ</div>
+            </div>
+            <div class="stat-grid">
+                <div class="stat-item"><div class="stat-label">ชนะไม้ 1</div><div class="stat-num" id="stat-w1" style="color: var(--success);">0</div></div>
+                <div class="stat-item"><div class="stat-label">ชนะไม้ 2</div><div class="stat-num" id="stat-w2" style="color: var(--blue);">0</div></div>
+                <div class="stat-item"><div class="stat-label">แพ้ (L)</div><div class="stat-num" id="stat-loss" style="color: var(--danger);">0</div></div>
+            </div>
+            <div class="balance-card">
+                <span style="font-size: 0.9rem; color: #666;">กำไรสะสม:</span>
+                <span class="bal-val" id="ui-bal">0</span>
+            </div>
+            <div class="btn-main2">
+                <button class="btn-w" onclick="process2('w')">ชนะ (W)</button>
+                <button class="btn-l" onclick="process2('l')">แพ้ (L)</button>
+            </div>
+            <button class="btn-u" onclick="undo2()">ย้อนกลับ (Undo)</button>
+            <button class="btn-h" onclick="toggleModal2(true)">📜 ดูประวัติการเดิมพัน</button>
+            <div style="margin-top: 15px; font-size: 0.7rem; color: #999; cursor: pointer;" onclick="resetAll2(true)">ล้างข้อมูลทั้งหมด</div>
         </div>
     </div>
 
-    <div id="historyModal" class="modal" onclick="closeModals()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="color: var(--neon-green); margin-top: 0;">ประวัติการชนะ</h3>
-            <div id="historyContainer" class="history-list"></div>
-            <button class="btn-sub" style="margin-top: 15px;" onclick="closeModals()">ปิด</button>
+    <div id="historyOverlay">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="margin:0;">บันทึกสถิติ</h2>
+            <button onclick="closeHistory()" style="background:none; border:none; color:#fff; font-size:24px;">✕</button>
         </div>
+        <div id="historyList" style="flex-grow:1; overflow-y:auto;"></div>
+        <button class="btn-sub" style="width:100%;" onclick="closeHistory()">ปิด</button>
     </div>
 
     <div id="mainSettingModal" class="modal" onclick="closeModals()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 style="color:var(--gold);">ตั้งค่า</h3>
-            <div style="text-align: left; font-size: 12px; display: grid; gap: 8px;">
-                <label>เงินเดินไม้ (10, 20...):</label><input type="text" id="money-sequence" value="10, 20, 40, 80, 160" style="width:100%; padding:10px; background:#000; color:#fff; border:1px solid #333; border-radius: 8px;">
-                <label>เป้าหมายกำไร:</label><input type="number" id="profit-target" value="" style="width:100%; padding:10px; background:#000; color:#fff; border:1px solid #333; border-radius: 8px;">
-                <div style="display: flex; gap: 5px;">
-                    <button class="btn-sub" onclick="openModal('logicModal')">DNA: <span id="curDNA">2^7</span></button>
-                    <button class="btn-sub" onclick="openModal('lvModal')">LV: <span id="curLv">1</span></button>
-                </div>
+            <h3 style="color:#ffd700;">ตั้งค่า</h3>
+            <div style="display:grid; gap:8px;">
+                <button class="btn-sub" onclick="openModal('logicModal')">DNA: <span id="curDNA">2^7</span></button>
+                <button class="btn-sub" onclick="openModal('woodModal')">ไม้ทบ: <span id="curWood">6</span></button>
+                <button class="btn-sub" onclick="openModal('lvModal')">LV ความแม่นยำ: <span id="curLv">1</span></button>
             </div>
-            <button class="btn-sub" style="margin-top:15px; background:var(--gold); color:#000; border:none;" onclick="updateConfigs()">บันทึก</button>
+            <button class="btn-sub" style="margin-top:15px; width:100%; background:#ffd700; color:#000;" onclick="closeModals()">ตกลง</button>
         </div>
     </div>
-    
-    <div id="logicModal" class="modal" onclick="closeModals()"><div class="modal-content" onclick="event.stopPropagation()"><h3 style="color:var(--neon-blue);">เลือก DNA</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><button class="btn-sub" onclick="setLogic(5)">2^5</button><button class="btn-sub" onclick="setLogic(7)">2^7</button><button class="btn-sub" onclick="setLogic(9)">2^9</button><button class="btn-sub" onclick="setLogic(11)">2^11</button></div></div></div>
-    <div id="lvModal" class="modal" onclick="closeModals()"><div class="modal-content" onclick="event.stopPropagation()"><h3 style="color:var(--neon-green);">ระดับ LV</h3><div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;"><button class="btn-sub" onclick="setLv(1)">1</button><button class="btn-sub" onclick="setLv(2)">2</button><button class="btn-sub" onclick="setLv(3)">3</button><button class="btn-sub" onclick="setLv(4)">4</button><button class="btn-sub" onclick="setLv(5)">5</button><button class="btn-sub" onclick="setLv(6)">6</button></div></div></div>
+    <div id="logicModal" class="modal" onclick="closeModals()"><div class="modal-content" onclick="event.stopPropagation()"><h3>เลือก DNA</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><button class="btn-sub" onclick="setLogic(5)">2^5</button><button class="btn-sub" onclick="setLogic(7)">2^7</button><button class="btn-sub" onclick="setLogic(9)">2^9</button><button class="btn-sub" onclick="setLogic(11)">2^11</button></div></div></div>
+    <div id="lvModal" class="modal" onclick="closeModals()"><div class="modal-content" onclick="event.stopPropagation()"><h3>ระดับ LV</h3><div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;"><button class="btn-sub" onclick="setLv(1)">1</button><button class="btn-sub" onclick="setLv(2)">2</button><button class="btn-sub" onclick="setLv(3)">3</button><button class="btn-sub" onclick="setLv(4)">4</button><button class="btn-sub" onclick="setLv(5)">5</button><button class="btn-sub" onclick="setLv(6)">6</button></div></div></div>
+    <div id="woodModal" class="modal" onclick="closeModals()"><div class="modal-content" onclick="event.stopPropagation()"><h3>จำนวนไม้ทบ</h3><div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px;"><button class="btn-sub" onclick="setWood(1)">1</button><button class="btn-sub" onclick="setWood(2)">2</button><button class="btn-sub" onclick="setWood(3)">3</button><button class="btn-sub" onclick="setWood(4)">4</button><button class="btn-sub" onclick="setWood(6)">6</button><button class="btn-sub" onclick="setWood(8)">8</button><button class="btn-sub" onclick="setWood(10)">10</button><button class="btn-sub" onclick="setWood(12)">12</button></div></div></div>
 
-<script>
-    let log = [], winDetails = [], historyStack = [];
-    let isFound = false, aim = "", isLoss = false, goalReached = false;
-    let selectedLv = 1, currentExp = 7, isSuperMode = false, lockedDNA = null;
-    let moneySequence = [10, 20, 40, 80, 160];
-    let mState = { idx: 0, pos: 1, bal: 0, bet: 10, isClearing: false };
+    <div id="historyModal2" class="modal">
+        <div class="modal-content modal-white">
+            <span style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;" onclick="toggleModal2(false)">&times;</span>
+            <h4 style="margin: 0 0 10px 0; color:#333;">ประวัติการเดินเงิน</h4>
+            <div class="log-list" id="log-list2">
+                <div style="color: #999; text-align: center;">ยังไม่มีข้อมูล</div>
+            </div>
+        </div>
+    </div>
 
-    const allProfiles = {};
-    [5, 7, 9, 11].forEach(exp => {
-        const count = Math.pow(2, exp); allProfiles[exp] = [];
-        for(let i=0; i<count; i++) allProfiles[exp].push(i.toString(2).padStart(exp,'0').split('').map(b => b === '0' ? 'M' : 'T'));
-    });
+    <script>
+        /* --- Logic Section 1 (พระยาขอน) --- */
+        let log1 = [], winHistory1 = [];
+        let currentStep1 = 0, isFound1 = false, aim1 = "", isLoss1 = false;
+        let selectedLv1 = 1, selectedWood1 = 6, currentExp1 = 7;
+        let isSuperMode1 = false, lockedDNA1 = null;
+        const allProfiles1 = {};
 
-    function calculateBet() {
-        let base = moneySequence[mState.idx] || moneySequence[moneySequence.length-1];
-        mState.bet = mState.isClearing ? base * 2 : base;
-    }
-
-    function processAdd(v) {
-        historyStack.push(JSON.stringify({ log: [...log], winDetails: [...winDetails], isFound, aim, isLoss, lockedDNA, mState: {...mState}, goalReached }));
-
-        if (isFound && v !== 'T') {
-            if (v === aim) { // WIN
-                mState.bal += mState.bet;
-                winDetails.unshift({ dna: "2^"+(lockedDNA||currentExp), step: (mState.idx+1), pos: mState.pos, bet: mState.bet, result: aim });
-                
-                // ตรวจสอบเป้าหมาย
-                let targetProfit = parseFloat(document.getElementById('profit-target').value);
-                if (mState.bal >= targetProfit && !goalReached) {
-                    goalReached = true;
-                    document.getElementById('finalProfit').innerText = mState.bal.toLocaleString();
-                    openModal('goalReachedModal');
-                }
-
-                if (mState.isClearing) { mState.isClearing = false; mState.pos = 1; }
-                else {
-                    if (mState.idx === 0 || mState.pos === 2) { mState.pos = 1; }
-                    else { mState.idx = Math.max(0, mState.idx - 1); mState.isClearing = true; mState.pos = 1; }
-                }
-                isFound = false; lockedDNA = null;
-            } else { // LOSS
-                mState.bal -= mState.bet;
-                if (mState.isClearing) {
-                    mState.isClearing = false;
-                    if(mState.idx >= moneySequence.length - 1) { isLoss = true; mState.idx = 0; } else { mState.idx++; }
-                    mState.pos = 1;
-                } else {
-                    if (mState.pos === 1) mState.pos = 2;
-                    else {
-                        if(mState.idx >= moneySequence.length - 1) { isLoss = true; mState.idx = 0; } else { mState.idx++; }
-                        mState.pos = 1;
-                    }
-                }
-                isFound = false;
+        [5, 7, 9, 11].forEach(exp => {
+            const count = Math.pow(2, exp);
+            allProfiles1[exp] = [];
+            for(let i=0; i<count; i++) {
+                allProfiles1[exp].push(i.toString(2).padStart(exp,'0').split('').map(b => b === '0' ? 'M' : 'T'));
             }
-        } else if (isLoss) { isLoss = false; }
-        
-        log.push(v);
-        calculateBet();
-        render();
-    }
+        });
 
-    function scanLogic(exp, cleanData) {
-        const profiles = allProfiles[exp];
-        let stats = Array.from({length: profiles.length}, () => ({streak:0}));
-        for (let r=0; r <= cleanData.length; r++) {
-            for (let d=0; d<profiles.length; d++) {
-                let pBit = profiles[d][r % exp], predict, actual = cleanData[r];
-                if (r > 0) {
-                    let prev = cleanData[r-1];
-                    predict = (pBit === 'M') ? prev : (prev === 'P' ? 'B' : 'P');
-                    if (actual === undefined) { if (stats[d].streak - (exp - 1) >= selectedLv) return predict; }
-                    else { if (predict !== actual) stats[d].streak++; else stats[d].streak = 0; }
+        function toggleSuperMode() {
+            isSuperMode1 = !isSuperMode1;
+            const btn = document.getElementById('superBtn');
+            btn.innerText = isSuperMode1 ? "⚡ SUPER ON" : "⚡ SUPER OFF";
+            btn.classList.toggle('on');
+            lockedDNA1 = null;
+            render1();
+        }
+        function toggleTheme() { document.body.classList.toggle('light-theme'); }
+        function openModal(id) { closeModals(); document.getElementById(id).style.display = 'flex'; }
+        function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+        function openHistory() { document.getElementById('historyOverlay').style.display = 'flex'; }
+        function closeHistory() { document.getElementById('historyOverlay').style.display = 'none'; }
+        function setLogic(exp) { currentExp1 = exp; document.getElementById('curDNA').innerText = `2^${exp}`; closeModals(); render1(); }
+        function setLv(v) { selectedLv1 = v; document.getElementById('curLv').innerText = v; closeModals(); render1(); }
+        function setWood(v) { selectedWood1 = v; document.getElementById('curWood').innerText = v; closeModals(); render1(); }
+
+        function processAdd(v) {
+            if (isFound1 && v !== 'T') {
+                if (v === aim1) { 
+                    winHistory1.unshift({ status: 'WIN', step: currentStep1 + 1, dna: lockedDNA1 || currentExp1, lv: selectedLv1 }); 
+                    currentStep1 = 0; isFound1 = false; lockedDNA1 = null;
+                } else { 
+                    currentStep1++; 
+                    if (currentStep1 >= selectedWood1) { 
+                        winHistory1.unshift({ status: 'LOSS', step: selectedWood1, dna: lockedDNA1 || currentExp1, lv: selectedLv1 });
+                        isLoss1 = true; currentStep1 = 0; isFound1 = false; lockedDNA1 = null;
+                    } 
                 }
-            }
-        } return null;
-    }
-
-    function render() {
-        const clean = log.filter(x => x !== 'T');
-        const target = document.getElementById('target');
-        const targetText = document.getElementById('targetText');
-        target.className = "target-circle";
-        document.getElementById('ui-bet').innerText = "";
-
-        if (isLoss) {
-            targetText.innerText = "L"; target.style.color = "var(--neon-red)";
-        } else {
-            if (clean.length >= 3) {
-                if (isSuperMode && !lockedDNA) {
-                    for (let e of [5, 7, 9, 11]) {
-                        let res = scanLogic(e, clean); if (res) { lockedDNA = e; aim = res; isFound = true; break; }
-                    }
-                } else { aim = scanLogic(lockedDNA || currentExp, clean); isFound = !!aim; }
-            }
-            if (isFound) {
-                targetText.innerText = (mState.pos === 1 ? "①" : "②") + aim;
-                document.getElementById('ui-bet').innerText = "[" + mState.bet + "]";
-                target.classList.add(`active-${aim}`);
-                document.getElementById('targetDna').innerText = "DNA 2^" + (lockedDNA || currentExp);
-            } else { targetText.innerText = "-"; document.getElementById('targetDna').innerText = ""; }
+            } else if (isLoss1) { isLoss1 = false; }
+            log1.push(v);
+            render1();
         }
 
-        const grid = document.getElementById('grid'); grid.innerHTML = "";
-        log.forEach(v => { const d = document.createElement('div'); d.className = 'dot ' + v; d.innerText = v; grid.appendChild(d); });
-        for(let i=log.length; i<72; i++) grid.appendChild(document.createElement('div')).className='dot';
+        function undo1() { log1.pop(); currentStep1 = 0; isFound1 = false; lockedDNA1 = null; render1(); }
+        function reset1() { if(confirm("ล้างข้อมูล?")) { log1=[]; winHistory1=[]; currentStep1=0; isFound1=false; lockedDNA1=null; render1(); } }
 
-        document.getElementById('ui-bal').innerText = mState.bal.toLocaleString();
-        document.getElementById('ui-bal').style.color = mState.bal >= 0 ? "var(--neon-green)" : "var(--neon-red)";
-        document.getElementById('ui-mode').innerText = (mState.isClearing ? "⭐ เคลียร์ S" : "ปกติ S") + (mState.idx+1);
-        document.getElementById('winCountSmall').innerText = winDetails.length;
-        document.getElementById('countP').innerText = log.filter(x=>x==='P').length;
-        document.getElementById('countB').innerText = log.filter(x=>x==='B').length;
-        document.getElementById('countT').innerText = log.filter(x=>x==='T').length;
+        function scanLogic(exp, cleanData) {
+            const profiles = allProfiles1[exp];
+            let stats = Array.from({length: profiles.length}, () => ({streak:0}));
+            for (let r=0; r <= cleanData.length; r++) {
+                for (let d=0; d<profiles.length; d++) {
+                    let pBit = profiles[d][r % exp], predict, actual = cleanData[r];
+                    if (r > 0) {
+                        let prev = cleanData[r-1];
+                        predict = (pBit === 'M') ? prev : (prev === 'P' ? 'B' : 'P');
+                        if (actual === undefined) {
+                            if (stats[d].streak - (exp - 1) >= selectedLv1) return predict;
+                        } else {
+                            if (predict !== actual) stats[d].streak++; else stats[d].streak = 0;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        function render1() {
+            const clean = log1.filter(x => x !== 'T');
+            const target = document.getElementById('target');
+            const targetText = document.getElementById('targetText');
+            const targetDna = document.getElementById('targetDna');
+            target.className = "target-circle";
+            targetDna.innerText = "";
+            if (isLoss1) {
+                targetText.innerText = "L";
+                target.style.color = "var(--loss-color)";
+            } else {
+                if (clean.length >= 3) {
+                    if (isSuperMode1 && !lockedDNA1) {
+                        for (let e of [5, 7, 9, 11]) {
+                            let res = scanLogic(e, clean);
+                            if (res) { lockedDNA1 = e; aim1 = res; isFound1 = true; break; }
+                        }
+                    } else {
+                        aim1 = scanLogic(lockedDNA1 || currentExp1, clean);
+                        isFound1 = !!aim1;
+                    }
+                }
+                if (isFound1) {
+                    targetText.innerText = (currentStep1 + 1) + aim1;
+                    target.classList.add(`active-${aim1}`);
+                    if (isSuperMode1) target.classList.add('super-active');
+                    targetDna.innerText = "DNA 2^" + (lockedDNA1 || currentExp1);
+                } else { targetText.innerText = "-"; }
+            }
+            const grid = document.getElementById('grid'); grid.innerHTML = "";
+            log1.forEach(v => {
+                const d = document.createElement('div'); d.className = 'dot ' + v; d.innerText = v; grid.appendChild(d);
+            });
+            for(let i=log1.length; i<72; i++) grid.appendChild(document.createElement('div')).className='dot';
+            document.getElementById('countP').innerText = log1.filter(x=>x==='P').length;
+            document.getElementById('countB').innerText = log1.filter(x=>x==='B').length;
+            document.getElementById('countT').innerText = log1.filter(x=>x==='T').length;
+            document.getElementById('winCountSmall').innerText = winHistory1.length;
+            document.getElementById('historyList').innerHTML = winHistory1.map((item, idx) => `
+                <div class="history-item">
+                    <div>
+                        <div style="font-size:10px; color:#555;">เกม ${winHistory1.length - idx} (2^${item.dna} LV.${item.lv})</div>
+                        <div style="font-weight:900;" class="${item.status==='WIN'?'win-text':'loss-text'}">${item.status==='WIN'?'✅ ชนะ':'❌ แพ้'}</div>
+                    </div>
+                    <div style="font-weight:900;">${item.status==='WIN'?'ไม้ '+item.step:'แพ้ ทบ '+selectedWood1}</div>
+                </div>
+            `).join('');
+        }
+
+        /* --- Logic Section 2 (ระบบทนอึด) --- */
+        let moneySequence2 = [10, 20, 40, 80, 160];
+        let state2 = { idx: 0, pos: 1, bal: 0, bet: 10, isClearing: false, stats: { w1: 0, w2: 0, loss: 0 } };
+        let history2 = [];
+
+        function toggleModal2(show) { document.getElementById('historyModal2').style.display = show ? 'block' : 'none'; }
         
-        document.getElementById('historyContainer').innerHTML = winDetails.map((w, i) => `
-            <div class="history-item"><span>#${winDetails.length-i} ชนะ ${w.result} (${w.dna})</span><span style="color:var(--gold)">S${w.step} M${w.pos} [+${w.bet}]</span></div>
-        `).join('') || "<div style='text-align:center; color:#444; margin-top:20px;'>ไม่มีข้อมูล</div>";
-    }
+        function updateSequence() {
+            const input = document.getElementById('money-sequence').value;
+            moneySequence2 = input.split(',').map(item => parseFloat(item.trim())).filter(item => !isNaN(item));
+            if (moneySequence2.length === 0) moneySequence2 = [10];
+            document.getElementById('step-count').innerText = moneySequence2.length;
+            state2.idx = Math.min(state2.idx, moneySequence2.length - 1);
+            calculateBet2();
+            updateUI2();
+        }
 
-    function toggleSuperMode() { isSuperMode = !isSuperMode; document.getElementById('superBtn').innerText = isSuperMode ? "⚡ SUPER ON" : "⚡ SUPER OFF"; document.getElementById('superBtn').classList.toggle('on'); lockedDNA = null; render(); }
-    function toggleTheme() { document.body.classList.toggle('light-theme'); }
-    function openModal(id) { closeModals(); document.getElementById(id).style.display = 'flex'; }
-    function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
-    function setLogic(exp) { currentExp = exp; document.getElementById('curDNA').innerText = `2^${exp}`; closeModals(); openModal('mainSettingModal'); render(); }
-    function setLv(v) { selectedLv = v; document.getElementById('curLv').innerText = v; closeModals(); openModal('mainSettingModal'); render(); }
-    function updateConfigs() { moneySequence = document.getElementById('money-sequence').value.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n)); document.getElementById('curTargetDisp').innerText = document.getElementById('profit-target').value; calculateBet(); closeModals(); render(); }
-    function undo() { if (historyStack.length > 0) { let p = JSON.parse(historyStack.pop()); log = p.log; winDetails = p.winDetails; isFound = p.isFound; aim = p.aim; isLoss = p.isLoss; lockedDNA = p.lockedDNA; mState = p.mState; goalReached = p.goalReached; render(); } }
-    
-    function resetAll() {
-        log=[]; winDetails=[]; isFound=false; isLoss=false; lockedDNA=null; goalReached=false;
-        mState={idx:0,pos:1,bal:0,bet:moneySequence[0],isClearing:false};
-        historyStack=[]; closeModals(); render();
-    }
-    
-    render();
-</script>
+        function calculateBet2() {
+            const baseMoney = moneySequence2[state2.idx];
+            state2.bet = state2.isClearing ? baseMoney * 2 : baseMoney;
+        }
+
+        function updateUI2() {
+            document.getElementById('ui-bet').innerText = state2.bet.toLocaleString();
+            document.getElementById('ui-step').innerText = `STEP ${state2.idx + 1}`;
+            document.getElementById('ui-pos').innerText = `ไม้ที่ ${state2.pos}`;
+            document.getElementById('stat-w1').innerText = state2.stats.w1;
+            document.getElementById('stat-w2').innerText = state2.stats.w2;
+            document.getElementById('stat-loss').innerText = state2.stats.loss;
+            const balUI = document.getElementById('ui-bal');
+            balUI.innerText = state2.bal.toLocaleString();
+            balUI.style.color = state2.bal >= 0 ? '#27ae60' : '#e74c3c';
+            const modeUI = document.getElementById('ui-mode');
+            const boxUI = document.getElementById('ui-box');
+            if (state2.isClearing) {
+                modeUI.innerText = "⭐ กำลังเคลียร์สเตปค้าง";
+                modeUI.className = "mode-tag clearing-active";
+                boxUI.style.background = "linear-gradient(135deg, #2c3e50, #e67e22)";
+            } else {
+                modeUI.innerText = "โหมดปกติ";
+                modeUI.className = "mode-tag";
+                boxUI.style.background = "var(--primary)";
+            }
+        }
+
+        function process2(res) {
+            history2.push(JSON.stringify({...state2, stats: {...state2.stats}}));
+            const target = parseFloat(document.getElementById('profit-target').value) || 0;
+            if (res === 'w') {
+                state2.bal += state2.bet;
+                addLog2(`✅ ชนะ: +${state2.bet}`, 'success');
+                if (state2.pos === 1) state2.stats.w1++; else state2.stats.w2++;
+                if (state2.bal >= 0 && state2.idx > 0) {
+                    addLog2(`♻️ กำไรคืนทุน: รีเซ็ตเริ่มใหม่`, 'success');
+                    state2.idx = 0; state2.pos = 1; state2.isClearing = false;
+                } else if (state2.bal >= target && target > 0) {
+                    alert(`🎯 บรรลุเป้าหมายกำไรสูงสุด ${state2.bal} แล้ว!`);
+                    resetAll2(false); return;
+                } else if (state2.isClearing) {
+                    state2.isClearing = false; state2.pos = 1;
+                } else {
+                    if (state2.idx === 0) { state2.pos = 1; }
+                    else if (state2.pos === 2) { state2.pos = 1; }
+                    else { state2.idx = Math.max(0, state2.idx - 1); state2.isClearing = true; state2.pos = 1; }
+                }
+            } else {
+                state2.bal -= state2.bet;
+                addLog2(`❌ แพ้: -${state2.bet}`, 'danger');
+                if (state2.isClearing) {
+                    state2.stats.loss++;
+                    state2.isClearing = false;
+                    state2.idx = Math.min(moneySequence2.length - 1, state2.idx + 1);
+                    state2.pos = 1;
+                } else {
+                    if (state2.pos === 1) { state2.pos = 2; }
+                    else { state2.stats.loss++; state2.idx = Math.min(moneySequence2.length - 1, state2.idx + 1); state2.pos = 1; }
+                }
+            }
+            calculateBet2();
+            updateUI2();
+        }
+
+        function undo2() {
+            if (history2.length > 0) {
+                state2 = JSON.parse(history2.pop());
+                const logList = document.getElementById('log-list2');
+                if (logList.firstChild && logList.firstChild.innerText !== "ยังไม่มีข้อมูล") logList.removeChild(logList.firstChild);
+                updateUI2();
+            }
+        }
+
+        function addLog2(m, type) {
+            const log = document.getElementById('log-list2');
+            if (log.innerText === "ยังไม่มีข้อมูล") log.innerHTML = "";
+            const d = document.createElement('div');
+            d.className = 'log-item';
+            d.style.color = type === 'success' ? '#27ae60' : (type === 'danger' ? '#e74c3c' : '#7f8c8d');
+            d.innerText = m;
+            log.prepend(d);
+        }
+
+        function resetAll2(ask) {
+            if (!ask || confirm("เริ่มใหม่ทั้งหมด?")) {
+                state2 = { idx: 0, pos: 1, bal: 0, bet: moneySequence2[0], isClearing: false, stats: { w1: 0, w2: 0, loss: 0 } };
+                history2 = [];
+                document.getElementById('log-list2').innerHTML = "<div style='text-align:center; color:#999;'>เริ่มรอบใหม่...</div>";
+                updateUI2();
+            }
+        }
+
+        // Initialize
+        render1();
+        updateSequence();
+
+        // Close Section 2 Modal if clicking outside
+        window.onclick = function(event) {
+            let m2 = document.getElementById('historyModal2');
+            if (event.target == m2) toggleModal2(false);
+            if (event.target.className === 'modal') closeModals();
+        }
+    </script>
 </body>
 </html>
